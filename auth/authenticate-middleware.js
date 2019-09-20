@@ -4,5 +4,21 @@
 */
 
 module.exports = (req, res, next) => {
-  res.status(401).json({ you: 'shall not pass!' });
+	const token = req.headers.authorization;
+	console.log(token);
+
+	if (token) {
+		jwt.verify(token, secrets.jwtSecret, (err, decodedToken) => {
+			if (err) {
+				console.err(err);
+				res.status(401).json({ error: 'token did not work' });
+			} else {
+				req.decodedToken = decodedToken;
+				console.log('decoded token', req.decodedJwt);
+				next();
+			}
+		});
+	} else {
+		res.status(500).json({ error: 'NO TOKEN' });
+	}
 };
