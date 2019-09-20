@@ -5,36 +5,30 @@ const bcrypt = require('bcryptjs');
 
 describe('server', () => {
 	beforeEach(async () => {
-		await db('users').truncate;
+		await db('users').truncate();
+	});
+
+	describe('environment test', () => {
+		it('set env to testing', () => {
+			expect(process.env.DB_ENV).toBe('testing');
+		});
 	});
 
 	describe('POST /api/auth/register', () => {
-		it('responds with json ', done => {
-			request(server)
-				.post('/api/auth/register')
-				.send({
-					username: 'jack'
-				})
-				.set('Accept', 'application/json')
-				.expect('Content-Type', /json/)
-				.expect(201)
-				.end((err, res) => {
-					if (err) return done(err);
-					done();
-				});
-		});
-
-		it('username', () => {
+		it('returns 201', () => {
 			return request(server)
 				.post('/api/auth/register')
-				.send({
-					username: 'kel',
-					password: 'kel'
-				})
-				.set('Content-Type', 'application/json')
+				.send({ username: 'admin', password: 'admin' })
 				.then(res => {
 					expect(res.status).toBe(201);
-					expect(res.body.username).toBe('kel');
+				});
+		});
+		it('test 500', () => {
+			return request(server)
+				.post('/api/auth/register')
+				.send({ password: 'admin' })
+				.then(res => {
+					expect(res.status).toBe(500);
 				});
 		});
 	});
